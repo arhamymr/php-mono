@@ -16,8 +16,4 @@ class Users extends Model
         'profile_picture',
         'last_seen'
     ];
-
-    protected $table = 'user';
-    
-
 }

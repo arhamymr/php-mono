@@ -1,13 +1,14 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Api\BaseController as BaseController;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
-use App\Models\User;
+use App\Models\Users;
 
-class UserController extends Controller
+class UserController extends BaseController
 {
     protected function successResponse($message, $data = [], $status = JsonResponse::HTTP_OK)
     {
@@ -30,10 +31,10 @@ class UserController extends Controller
     public function index()
     {
         try {
-            $users = User::all();
-            return $this->successResponse('Users retrieved successfully', $users);
+            $users = Users::all();
+            return $this->sendResponse($users, 'Users retrieved successfully',);
         } catch (\Exception $e) {
-            return $this->errorResponse('Error retrieving users', $e->getMessage());
+            return $this->errorError($e->getMessage());
         }
     }
 
@@ -46,17 +47,16 @@ class UserController extends Controller
             //     'password_hash' => 'required|string',
             // ]);
 
+            $users = new Users();
+                    
+            $users->username = $request->input("username");
+            $users->phone_number = $request->input("phone_number");
+            $users->password_hash = bcrypt($request->input("password_hash"));
+            $users->save();
 
-            $user = new User();
-
-            $user->username = 'user';
-            $user->phone_number = '08942323';
-            $user->password_hash = bcrypt('password123');
-            $user->save();
-
-            return $this->successResponse('User created successfully', $user, JsonResponse::HTTP_CREATED);
+            return $this->sendResponse($users, 'User created successfully');
         } catch (\Exception $e) {
-            return $this->errorResponse('Error creating user', $e->getMessage());
+            return $this->sendError($e->getMessage());
         }
     }
 }
